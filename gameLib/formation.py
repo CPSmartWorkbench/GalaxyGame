@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 from gameLib import *
 
@@ -13,6 +14,10 @@ ATTACK_Y_MIN = 200
 ATTACK_Y_MAX = 300
 
 FIRE_TIME = 2400
+
+TWO_PI = 6.28318530718
+FIRE_ANGLE = 1.57079632679
+ROTARY_FIRE_TIMER = 800
 
 class Formation(pygame.sprite.Group):
 
@@ -131,9 +136,75 @@ class Formation(pygame.sprite.Group):
         
         yield False
 
+    def _circle_level_generator(self):
+        self._main_ships = []
+
+        self._center_x = self._world.size[0] / 2
+        self._center_y = self._world.size[1] / 4
+
+        advance_timer = pygame.time.get_ticks() + random.randint(1000, 2000)
+        enemies_left = True
+        fire_timer = pygame.time.get_ticks() + FIRE_TIME
+
+        # Generate enemies in a circle
+        n = (self._size ** 2) // 2
+        radius = self._spacing * 2
+        rotary_ships = []
+        for i in range(n):
+            x = self._center_x + radius * math.cos(i / n * TWO_PI)
+            y = self._center_y + radius * math.sin(i / n * TWO_PI)
+
+            enemy = Enemy(self._world, Vector(x, y))
+
+            self._main_ships.append(enemy)
+            rotary_ships.append(enemy)
+            self.add(enemy)
+
+        rotation_offset = 0
+        fire_timer = pygame.time.get_ticks() + ROTARY_FIRE_TIMER
+
+        # Update generator loop
+        while enemies_left:
+            self._center_x += self._move_x * self._world.delta_time
+            if (self._move_x > 0 and self._center_x > self._max_x - random.randint(0, 100)):
+                self._move_x = -MOVE_SPEED
+
+            elif (self._move_x < 0 and self._center_x < self._min_x + random.randint(0, 100)):
+                self._move_x = MOVE_SPEED
+
+            rotation_offset += 0.0005 * self._world.delta_time
+
+            enemies_left = False
+            temp_array = []
+
+            for i in range(len(rotary_ships)):
+                ship = rotary_ships[i]
+                radians = (i / n * TWO_PI + rotation_offset) % TWO_PI
+                ship.position.x = self._center_x + radius * math.cos(radians)
+                ship.position.y = self._center_y + radius * math.sin(radians)
+
+                if (radians < FIRE_ANGLE + 0.1 and radians > FIRE_ANGLE - 0.1):
+                    if (pygame.time.get_ticks() > fire_timer):
+                        ship.fire()
+                        fire_timer = pygame.time.get_ticks() + ROTARY_FIRE_TIMER
+                
+                
+                if ship.alive():
+                    enemies_left = True
+                    temp_array.append(ship)
+
+            self._main_ships = temp_array
+
+            yield True
+        
+        yield False
+
     def update(self):
         if self._level_generator_instance is None:
-            self._level_generator_instance = self._square_level_generator()
+            if (random.random() < 0.7):
+                self._level_generator_instance = self._square_level_generator()
+            else:
+                self._level_generator_instance = self._circle_level_generator()
         
         else:
             if not next(self._level_generator_instance):

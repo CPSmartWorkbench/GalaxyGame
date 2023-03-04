@@ -6,7 +6,7 @@ from track import HandInput
 
 BACKGROUND_COLOR = (0, 0, 0)
 HIGHSCORE_PATH = 'hs.txt'
-TIMEOUT = 1000 * 5 * 60 # 5 seconds
+TIMEOUT = 1000 * 5 * 60 # 5 minutes
 
 class GameState(Enum):
     IN_MENU = 0
@@ -136,7 +136,7 @@ class Game:
         return process
 
 def main():
-    game = Game((800, 600), camera_input=False, fullscreen=True)
+    game = Game((800, 600), camera_input=True, fullscreen=True)
     game.run()
 
 if __name__ == "__main__":
