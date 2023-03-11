@@ -1,6 +1,7 @@
 import pygame
 from enum import Enum
 import sys
+import math
 
 from gameLib import *
 from track import HandInput
@@ -10,6 +11,9 @@ HIGHSCORE_PATH = 'hs.txt'
 TIMEOUT = 1000 * 5 * 60 # 5 minutes
 
 DEFAULT_SCREEN_SIZE = (800, 600)
+
+LIFE_IMAGE = pygame.transform.scale(pygame.image.load('textures/HeartPoint.png'), (DEFAULT_SIZE, DEFAULT_SIZE))
+LIFE_IMAGE.set_colorkey((0, 0, 0))
 
 class GameState(Enum):
     IN_MENU = 0
@@ -29,7 +33,7 @@ class Game:
         else:
             screen_size = DEFAULT_SCREEN_SIZE
 
-        self.screen = pygame.display.set_mode(screen_size, display)
+        self.screen = pygame.display.set_mode(screen_size, display=display)
 
         if (fullscreen):
             pygame.display.toggle_fullscreen()
@@ -62,6 +66,12 @@ class Game:
             img = self.font.render(f"Score: {self.world.score}", True, (255, 255, 255))
 
             self.screen.blit(img, (0, 0))
+
+            health = math.ceil(self.player.health / PLAYER_STARTING_HEALTH * 3)
+            img = LIFE_IMAGE
+
+            for heart in range(1, health + 1):
+                self.screen.blit(img, (self.screen.get_width() - img.get_width() * heart, 0))
 
         if self.state == GameState.IN_MENU:
             self.menu.group.draw(self.screen)
