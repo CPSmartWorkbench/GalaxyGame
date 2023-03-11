@@ -51,7 +51,6 @@ class Menu:
             self.start_button.rect.y <= y and y <= self.start_button.rect.y + self.start_button.rect.height
     
     def update_highscore(self, highscore):
-        print(highscore)
         screen_x, screen_y = self.screen_size
         img = self.font.render(f"High Score: {highscore}", False, (255, 255, 255))
         self.highscore_text.image = img

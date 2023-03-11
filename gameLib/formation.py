@@ -72,10 +72,10 @@ class Formation(pygame.sprite.Group):
         while enemies_left:
             self._center_x += self._move_x * self._world.delta_time
             if (self._move_x > 0 and self._center_x > self._max_x - random.randint(0, 100)):
-                self._move_x = -MOVE_SPEED
+                self._move_x = -MOVE_SPEED * self._level_to_speed_modifer(self._world.level)
 
             elif (self._move_x < 0 and self._center_x < self._min_x + random.randint(0, 100)):
-                self._move_x = MOVE_SPEED
+                self._move_x = MOVE_SPEED * self._level_to_speed_modifer(self._world.level)
     
             if (advance_timer < pygame.time.get_ticks() and len(self._attack_ships) < 4):
                 advance_timer = pygame.time.get_ticks() + random.randint(ADVANCE_MIN, ADVANCE_MAX)
@@ -119,7 +119,7 @@ class Formation(pygame.sprite.Group):
 
                 elif (distance_to_target >= 20):
                     d = self._target_pos_dict[ship][1] - self._target_pos_dict[ship][0]
-                    d = d * 0.001 * self._world.delta_time
+                    d = d * 0.001 * self._world.delta_time * self._level_to_speed_modifer(self._world.level)
                     ship.position.x = ship.position.x + d.x
                     ship.position.y = ship.position.y + d.y
 
@@ -172,7 +172,7 @@ class Formation(pygame.sprite.Group):
             elif (self._move_x < 0 and self._center_x < self._min_x + random.randint(0, 100)):
                 self._move_x = MOVE_SPEED
 
-            rotation_offset += 0.0005 * self._world.delta_time
+            rotation_offset += 0.0005 * self._world.delta_time * self._level_to_speed_modifer(self._world.level)
 
             enemies_left = False
             temp_array = []
@@ -201,9 +201,12 @@ class Formation(pygame.sprite.Group):
 
     def update(self):
         if self._level_generator_instance is None:
+            self._world.level += 1
             if (random.random() < 0.7):
+                self._world.level_score_modifier = int(5 * self._level_to_speed_modifer(self._world.level))
                 self._level_generator_instance = self._square_level_generator()
             else:
+                self._world.level_score_modifier = int(15 * self._level_to_speed_modifer(self._world.level))
                 self._level_generator_instance = self._circle_level_generator()
         
         else:
@@ -211,4 +214,7 @@ class Formation(pygame.sprite.Group):
                 self._level_generator_instance = None
 
         pygame.sprite.Group.update(self)
+    
+    def _level_to_speed_modifer(self, level):
+        return math.log(level / 2 + 1) + 1
     

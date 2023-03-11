@@ -12,6 +12,8 @@ class World:
         self.enemy_group = Formation(self, 3)
         self.score = 0
         self.player = None
+        self.level = 0
+        self.level_score_modifier = 1
     
     def draw(self, surface):
         self.ally_group.draw(surface)

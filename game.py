@@ -12,8 +12,7 @@ TIMEOUT = 1000 * 5 * 60 # 5 minutes
 
 DEFAULT_SCREEN_SIZE = (800, 600)
 
-LIFE_IMAGE = pygame.transform.scale(pygame.image.load('textures/HeartPoint.png'), (DEFAULT_SIZE, DEFAULT_SIZE))
-LIFE_IMAGE.set_colorkey((0, 0, 0))
+LIFE_IMAGE = pygame.image.load('textures/HeartPoint.png')
 
 class GameState(Enum):
     IN_MENU = 0
@@ -49,6 +48,9 @@ class Game:
         self.world = None
         self.player = None
 
+        self.heart_image = pygame.transform.scale(LIFE_IMAGE, (DEFAULT_SIZE, DEFAULT_SIZE))
+        self.heart_image.set_colorkey((0, 0, 0))
+
         with open(HIGHSCORE_PATH, 'r') as f:
             self._highscore = int(f.read())
 
@@ -67,11 +69,14 @@ class Game:
 
             self.screen.blit(img, (0, 0))
 
+            img = self.font.render(f"Level: {self.world.level}", True, (255, 255, 255))
+
+            self.screen.blit(img, (0, img.get_height()))
+
             health = math.ceil(self.player.health / PLAYER_STARTING_HEALTH * 3)
-            img = LIFE_IMAGE
 
             for heart in range(1, health + 1):
-                self.screen.blit(img, (self.screen.get_width() - img.get_width() * heart, 0))
+                self.screen.blit(self.heart_image, (self.screen.get_width() - self.heart_image.get_width() * heart, 0))
 
         if self.state == GameState.IN_MENU:
             self.menu.group.draw(self.screen)
@@ -103,6 +108,10 @@ class Game:
         if (self.state == GameState.PLAYING_GAME):
             if (key == pygame.K_SPACE and press_type == pygame.KEYDOWN):
                 self.player.fire()
+            elif (key == pygame.K_UP and press_type == pygame.KEYDOWN):
+                self.world.level += 1
+            elif (key == pygame.K_DOWN and press_type == pygame.KEYDOWN):
+                self.world.level -= 1
     
     def run(self):
         while self.state != GameState.QUIT:
