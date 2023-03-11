@@ -1,5 +1,6 @@
 import pygame
 from enum import Enum
+import sys
 
 from gameLib import *
 from track import HandInput
@@ -8,6 +9,8 @@ BACKGROUND_COLOR = (0, 0, 0)
 HIGHSCORE_PATH = 'hs.txt'
 TIMEOUT = 1000 * 5 * 60 # 5 minutes
 
+DEFAULT_SCREEN_SIZE = (800, 600)
+
 class GameState(Enum):
     IN_MENU = 0
     PLAYING_GAME = 1
@@ -15,13 +18,18 @@ class GameState(Enum):
 
 class Game:
 
-    def __init__(self, screen_size, camera_input=True, fullscreen=False):
+    def __init__(self, display, camera_input=True, fullscreen=False):
         pygame.init()
 
-        if (fullscreen):
-            screen_size = pygame.display.get_desktop_sizes()[0]
+        if (display > pygame.display.get_num_displays() - 1):
+            display = pygame.display.get_num_displays() - 1
 
-        self.screen = pygame.display.set_mode(screen_size)
+        if (fullscreen):
+            screen_size = pygame.display.get_desktop_sizes()[display]
+        else:
+            screen_size = DEFAULT_SCREEN_SIZE
+
+        self.screen = pygame.display.set_mode(screen_size, display)
 
         if (fullscreen):
             pygame.display.toggle_fullscreen()
@@ -136,7 +144,9 @@ class Game:
         return process
 
 def main():
-    game = Game((800, 600), camera_input=True, fullscreen=True)
+    debug_mode = (len(sys.argv) > 1 and sys.argv[1] == 'debug')
+
+    game = Game([1, 0][debug_mode], camera_input=(not debug_mode), fullscreen=(not debug_mode))
     game.run()
 
 if __name__ == "__main__":

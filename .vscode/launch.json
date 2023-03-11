@@ -2,12 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run Game",
+            "name": "Run Game",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/game.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Debug Mode",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/game.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : ["debug"]
         }
     ]
 }
