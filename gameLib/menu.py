@@ -17,12 +17,19 @@ class Menu:
         title.rect.x = screen_x / 2 - title.rect.width / 2
         title.rect.y = screen_y / 2 - title.rect.height - 100
 
-        img = font.render("Hold up hands", False, (255, 255, 255))
+        img = font.render("Hold firing hand above moving hand, pinch to fire", False, (255, 255, 255))
         info = pygame.sprite.Sprite(self.group)
         info.image = img
         info.rect = img.get_rect()
         info.rect.x = screen_x / 2 - info.rect.width / 2
-        info.rect.y = screen_y - info.rect.height - 30
+        info.rect.y = screen_y - info.rect.height - 20
+
+        img = font.render("Hold up hands", False, (255, 255, 255))
+        info2 = pygame.sprite.Sprite(self.group)
+        info2.image = img
+        info2.rect = img.get_rect()
+        info2.rect.x = screen_x / 2 - info2.rect.width / 2
+        info2.rect.y = screen_y - info2.rect.height - 60
 
         img = font.render(f"High Score: {highscore}", False, (255, 255, 255))
         self.highscore_text = pygame.sprite.Sprite(self.group)
